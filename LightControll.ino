@@ -23,13 +23,14 @@ void setup() {
 
   // pcf.startClock();//start the clock
 
-  Serial.begin(9600);
+  // Serial.begin(9600);
 }
 
 void loop() {
   Time nowTime = pcf.getTime();
   lightControl(nowTime);
   //fanControl(nowTime);
+  //printTime(nowTime);
 }
 
 void lightControl(Time nowTime)
@@ -38,12 +39,11 @@ void lightControl(Time nowTime)
   int lightStartTime = 630;
   int darkStartTime = 1290;
   bool shouldBeOn = (currentTimeInMinutes >= lightStartTime && currentTimeInMinutes < darkStartTime);
-
   if(shouldBeOn != isLightOn)
   {
     isLightOn = shouldBeOn;
     digitalWrite(LIGHT_CTRL_PIN, isLightOn ? HIGH : LOW);
-    Serial.println(isLightOn ? "HIGH" : "LOW");
+    // Serial.println(isLightOn ? "HIGH" : "LOW");
   }
 }
 
@@ -54,4 +54,12 @@ void fanControl(Time nowTime){
   // delay(5000);
   analogWrite(FAN_PIN, 0);   // wentylator niskie obroty
   delay(5000);
+}
+
+void printTime(Time nowTime){
+  Serial.print(nowTime.hour);
+  Serial.print(":");
+  Serial.print(nowTime.minute);
+  Serial.print(":");
+  Serial.println(nowTime.second);
 }
