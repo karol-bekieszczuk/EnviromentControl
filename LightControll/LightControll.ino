@@ -11,14 +11,14 @@ void setup() {
   pinMode(FAN_PIN, OUTPUT);
   digitalWrite(LIGHT_CTRL_PIN, LOW);
   pcf.init();//initialize the clock
+  
   // pcf.stopClock();//stop the clock
-
-  // //set time to to 31/3/2018 17:33:0
-  // pcf.setYear(18);//set year
-  // pcf.setMonth(3);//set month
-  // pcf.setDay(31);//set dat
-  // pcf.setHour(17);//set hour
-  // pcf.setMinut(33);//set minut
+  // set time to to 31/3/2018 17:33:0
+  // pcf.setYear(25);//set year
+  // pcf.setMonth(11);//set month
+  // pcf.setDay(4);//set day
+  // pcf.setHour(22);//set hour
+  // pcf.setMinut(23);//set minut
   // pcf.setSecond(0);//set second
 
   // pcf.startClock();//start the clock
@@ -29,15 +29,15 @@ void setup() {
 void loop() {
   Time nowTime = pcf.getTime();
   lightControl(nowTime);
-  //fanControl(nowTime);
-  //printTime(nowTime);
+  // fanControl(nowTime);
+  // printTime(nowTime);
 }
 
 void lightControl(Time nowTime)
 {
   int currentTimeInMinutes = nowTime.hour * 60 + nowTime.minute;
-  int lightStartTime = 630;
-  int darkStartTime = 1290;
+  int lightStartTime = 570; //09:30
+  int darkStartTime = 1290; //21:30
   bool shouldBeOn = (currentTimeInMinutes >= lightStartTime && currentTimeInMinutes < darkStartTime);
   if(shouldBeOn != isLightOn)
   {
