@@ -3,25 +3,31 @@
 PCF8563 pcf;
 
 const int LIGHT_CTRL_PIN = 2;
-const int FAN_PIN = 3;
+const int FAN_POWER_PIN = 5;
+const int FAN_PWM_PIN = 3;
 bool isLightOn = false;
 
 void setup() {
   pinMode(LIGHT_CTRL_PIN, OUTPUT);
-  pinMode(FAN_PIN, OUTPUT);
+  pinMode(FAN_POWER_PIN, OUTPUT);
+  pinMode(FAN_PWM_PIN, OUTPUT);
+  analogWrite(FAN_PWM_PIN, 0);
+  digitalWrite(FAN_POWER_PIN, LOW);
   digitalWrite(LIGHT_CTRL_PIN, LOW);
   pcf.init();//initialize the clock
   
-  // pcf.stopClock();//stop the clock
   // set time to to 31/3/2018 17:33:0
+  // pcf.stopClock();//stop the clock
+
   // pcf.setYear(25);//set year
-  // pcf.setMonth(11);//set month
-  // pcf.setDay(4);//set day
-  // pcf.setHour(22);//set hour
-  // pcf.setMinut(23);//set minut
+  // pcf.setMonth(12);//set month
+  // pcf.setDay(14);//set day
+  // pcf.setHour(20);//set hour
+  // pcf.setMinut(5);//set minut
   // pcf.setSecond(0);//set second
 
   // pcf.startClock();//start the clock
+  //
 
   // Serial.begin(9600);
 }
@@ -29,7 +35,7 @@ void setup() {
 void loop() {
   Time nowTime = pcf.getTime();
   lightControl(nowTime);
-  // fanControl(nowTime);
+  fanControl(nowTime);
   // printTime(nowTime);
 }
 
@@ -48,12 +54,22 @@ void lightControl(Time nowTime)
 }
 
 void fanControl(Time nowTime){
-  // analogWrite(FAN_PIN, 128); // ~50% obrotów
-  // delay(10000);
-  // analogWrite(FAN_PIN, 255); // 100% obrotów
-  // delay(5000);
-  analogWrite(FAN_PIN, 0);   // wentylator niskie obroty
-  delay(5000);
+    int hour = nowTime.hour;
+    int minute = nowTime.minute;
+
+    if (hour >= 10 && hour < 22) { // tylko w przedziale 10-22
+        int minutesSinceStart = (hour - 10) * 60 + minute; // minuty od 10:00
+        if (minutesSinceStart % 21 < 1) { // 1 minuta ON
+            digitalWrite(FAN_POWER_PIN, HIGH);
+            analogWrite(FAN_PWM_PIN, 254);
+        } else {
+            digitalWrite(FAN_POWER_PIN, LOW);
+            analogWrite(FAN_PWM_PIN, 0);
+        }
+    } else {
+        digitalWrite(FAN_POWER_PIN, LOW);
+        analogWrite(FAN_PWM_PIN, 0);
+    }
 }
 
 void printTime(Time nowTime){
