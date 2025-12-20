@@ -4,11 +4,18 @@ PCF8563 pcf;
 
 constexpr int LIGHT_CTRL_PIN = 2;
 constexpr int FAN_POWER_PIN = 5;
-constexpr int FAN_PWM_PIN = 3;
+constexpr int FAN_PWM_PIN = 9;
 constexpr int CYCLE_START_MIN = 570; //09:30
 constexpr int CYCLE_STOP_MIN = 1290; //21:30
+const uint16_t TOP = 640; // 16 MHz / 25 kHz TOP - maximum counter value
 
 void setup() {
+  //************** manualy set timers **************//
+  TCCR1A = (1 << COM1A1) | (1 << WGM11);
+  TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS10);
+
+  ICR1 = TOP;
+  //************** end manualy set timers **************//
   //************** set up pins mode **************//
   pinMode(LIGHT_CTRL_PIN, OUTPUT);
   pinMode(FAN_POWER_PIN, OUTPUT);
@@ -17,7 +24,6 @@ void setup() {
   //************** set up pins default state **************//
   digitalWrite(LIGHT_CTRL_PIN, LOW);
   digitalWrite(FAN_POWER_PIN, LOW);
-  analogWrite(FAN_PWM_PIN, 0);
   //************** end set up pins default state **************//
   //************** initialize the clock **************//
   pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
@@ -67,7 +73,8 @@ void fanControl(int currentTimeInMinutes){
   {
     isFanOn = shouldBeOn;
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
-    analogWrite(FAN_PWM_PIN, isFanOn ? 254 : 0);
+    uint8_t percent = constrain(50, 20, 100); // nie schodź niżej
+    OCR1A = map(percent, 0, 100, 0, TOP);
   }
 }
 
