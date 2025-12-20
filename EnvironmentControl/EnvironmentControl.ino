@@ -1,87 +1,45 @@
-#include <PCF8563.h>
+const byte OC1A_PIN = 9;
+const byte OC1B_PIN = 10;
 
-PCF8563 pcf;
+const word  PWM_FREQ_HZ = 25000; //Adjust this value to adjust the frequency (Frequency in HZ!)  (Set currently to 25kHZ)
+const word TCNT1_TOP = 16000000/(2*PWM_FREQ_HZ);
 
-constexpr int LIGHT_CTRL_PIN = 2;
-constexpr int FAN_POWER_PIN = 5;
-constexpr int FAN_PWM_PIN = 9;
-constexpr int CYCLE_START_MIN = 570; //09:30
-constexpr int CYCLE_STOP_MIN = 1290; //21:30
-const uint16_t TOP = 640; // 16 MHz / 25 kHz TOP - maximum counter value
-
-void setup() {
-  //************** manualy set timers **************//
-  TCCR1A = (1 << COM1A1) | (1 << WGM11);
-  TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS10);
-
-  ICR1 = TOP;
-  //************** end manualy set timers **************//
-  //************** set up pins mode **************//
-  pinMode(LIGHT_CTRL_PIN, OUTPUT);
-  pinMode(FAN_POWER_PIN, OUTPUT);
-  pinMode(FAN_PWM_PIN, OUTPUT);
-  //************** end set up pins mode **************//
-  //************** set up pins default state **************//
-  digitalWrite(LIGHT_CTRL_PIN, LOW);
-  digitalWrite(FAN_POWER_PIN, LOW);
-  //************** end set up pins default state **************//
-  //************** initialize the clock **************//
-  pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
+void  setup() {
   
-  // set RTC time
-  // pcf.stopClock();//stop the clock
+  pinMode(OC1A_PIN, OUTPUT);
 
-  // pcf.setYear(25);//set year
-  // pcf.setMonth(12);//set month
-  // pcf.setDay(15);//set day
-  // pcf.setHour(16);//set hour
-  // pcf.setMinut(28);//set minut
-  // pcf.setSecond(0);//set second
+  // Clear Timer1 control  and count registers
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1  = 0;
 
-  // pcf.startClock();//start the clock
-  //************** end initialize the clock **************//
-
-  // Serial.begin(9600);
+  //  Set Timer1 configuration
+  // COM1A(1:0) = 0b10   (Output A clear rising/set  falling)
+  // COM1B(1:0) = 0b00   (Output B normal operation)
+  // WGM(13:10)  = 0b1010 (Phase correct PWM)
+  // ICNC1      = 0b0    (Input capture noise canceler  disabled)
+  // ICES1      = 0b0    (Input capture edge select disabled)
+  //  CS(12:10)  = 0b001  (Input clock select = clock/1)
+  
+  TCCR1A |= (1 << COM1A1)  | (1 << WGM11);
+  TCCR1B |= (1 << WGM13) | (1 << CS10);
+  ICR1 = TCNT1_TOP;
 }
 
-void loop() {
-  Time nowTime = pcf.getTime();
-  int currentTimeInMinutes = nowTime.hour * 60 + nowTime.minute;
+void  loop() {
 
-  lightControl(currentTimeInMinutes);
-  fanControl(currentTimeInMinutes);
-  // printTime(nowTime);
+    setPwmDuty(0);
+    delay(5000);
+    setPwmDuty(25); //Change  this value 0-100 to adjust duty cycle
+    delay(5000);
+//    setPwmDuty(50);
+//    delay(20000);
+//    setPwmDuty(75);
+//    delay(20000);
+//    setPwmDuty(100);
+//    delay(20000);
 }
 
-void lightControl(int currentTimeInMinutes)
-{
-  static bool isLightOn = false;
-  bool shouldBeOn = (currentTimeInMinutes >= CYCLE_START_MIN && currentTimeInMinutes < CYCLE_STOP_MIN);
-  if(shouldBeOn != isLightOn)
-  {
-    isLightOn = shouldBeOn;
-    digitalWrite(LIGHT_CTRL_PIN, isLightOn ? HIGH : LOW);
-  }
-}
-
-void fanControl(int currentTimeInMinutes){
-  static bool isFanOn = false;
-  bool shouldBeOn = (currentTimeInMinutes >= CYCLE_START_MIN && 
-                      currentTimeInMinutes < CYCLE_STOP_MIN &&
-                      currentTimeInMinutes % 21 == 0);
-  if(shouldBeOn != isFanOn)
-  {
-    isFanOn = shouldBeOn;
-    digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
-    uint8_t percent = constrain(50, 20, 100); // nie schodź niżej
-    OCR1A = map(percent, 0, 100, 0, TOP);
-  }
-}
-
-void printTime(Time nowTime){
-  Serial.print(nowTime.hour);
-  Serial.print(":");
-  Serial.print(nowTime.minute);
-  Serial.print(":");
-  Serial.println(nowTime.second);
+void setPwmDuty(byte duty) {
+  OCR1A = (word) (duty*TCNT1_TOP)/100;
 }
