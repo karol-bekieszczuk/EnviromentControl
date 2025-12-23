@@ -1,8 +1,6 @@
 #include <PCF8563.h>
 #include <FanController.h>
 
-PCF8563 pcf;
-
 constexpr int LIGHT_CTRL_PIN = 2;
 constexpr int FAN_POWER_PIN = 10;
 constexpr int FAN_PWM_PIN = 9;
@@ -14,9 +12,11 @@ constexpr int CYCLE_STOP_MIN = 1290; //21:30
 // while a higher value will give more accurate and smooth readings
 constexpr int FAN_SENSOR_THRESHOLD = 1000;
 
+PCF8563 pcf;
 FanController fan(FAN_SENSOR_PIN, FAN_SENSOR_THRESHOLD, FAN_PWM_PIN);
 
-void setup() {
+void setup() 
+{
   //************** set up pins mode **************//
   pinMode(LIGHT_CTRL_PIN, OUTPUT);
   pinMode(FAN_POWER_PIN, OUTPUT);
@@ -31,30 +31,34 @@ void setup() {
   pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
   
   // set RTC time
-  pcf.stopClock();//stop the clock
+  // pcf.stopClock();//stop the clock
 
-  pcf.setYear(25);//set year
-  pcf.setMonth(12);//set month
-  pcf.setDay(23);//set day
-  pcf.setHour(17);//set hour
-  pcf.setMinut(1);//set minut
-  pcf.setSecond(50);//set second
+  // pcf.setYear(25);//set year
+  // pcf.setMonth(12);//set month
+  // pcf.setDay(23);//set day
+  // pcf.setHour(18);//set hour
+  // pcf.setMinut(3);//set minut
+  // pcf.setSecond(50);//set second
 
-  pcf.startClock();//start the clock
+  // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
 
   fan.begin();
 
-  Serial.begin(9600);
+  // Serial.begin(9600);
 }
 
-void loop() {
+void loop() 
+{
   Time nowTime = pcf.getTime();
   int currentTimeInMinutes = nowTime.hour * 60 + nowTime.minute;
 
   lightControl(currentTimeInMinutes);
   fanControl(currentTimeInMinutes);
-  // printTime(nowTime);
+  // if(Serial.available() > 0){
+    // printTime(nowTime);
+    // printFanData();
+  // }
 }
 
 void lightControl(int currentTimeInMinutes)
@@ -75,32 +79,15 @@ void fanControl(int currentTimeInMinutes){
                       currentTimeInMinutes % 21 == 0);
   if(shouldBeOn != isFanOn)
   {
-    //move serials to separate function
     isFanOn = shouldBeOn;
-    Serial.print("Current speed: ");
-    unsigned int rpms = fan.getSpeed(); // Send the command to get RPM
-    Serial.print(rpms);
-    Serial.println("RPM");
-
-
-    // Set fan duty cycle
-
-    // Get duty cycle
-    byte dutyCycle = fan.getDutyCycle();
-    Serial.print("Duty cycle: ");
-    Serial.println(dutyCycle, DEC);
-    Serial.println(isFanOn);
+ 
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
-
+    //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
     byte target = max(min(isFanOn ? 50 : 0, 100), 0);
-
-    Serial.print("Setting duty cycle: ");
-    Serial.println(target, DEC);
     fan.setDutyCycle(target);
-    // analogWrite(FAN_PWM_PIN, isFanOn ? 254 : 0);
   }
 
-    // Not really needed, just avoiding spamming the monitor,
+  // Not really needed, just avoiding spamming the monitor,
   // readings will be performed no faster than once every THRESHOLD ms anyway
   delay(250);
 }
@@ -111,4 +98,18 @@ void printTime(Time nowTime){
   Serial.print(nowTime.minute);
   Serial.print(":");
   Serial.println(nowTime.second);
+}
+
+void printFanData()
+{
+  Serial.print("Current speed: ");
+  //sprawdzic czy da sie wrzucic zawartosc rpms do linii ponizej
+  unsigned int rpms = fan.getSpeed();
+  Serial.print(rpms);
+  Serial.println("RPM");
+
+  Serial.print("Duty cycle: ");
+  //sprawdzic czy da sie wrzucic zawartosc dutyCycle do linii ponizej
+  byte dutyCycle = fan.getDutyCycle();
+  Serial.println(dutyCycle, DEC);
 }
