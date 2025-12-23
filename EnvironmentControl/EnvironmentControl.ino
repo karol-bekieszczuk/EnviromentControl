@@ -4,7 +4,7 @@
 PCF8563 pcf;
 
 constexpr int LIGHT_CTRL_PIN = 2;
-constexpr int FAN_POWER_PIN = 5;
+constexpr int FAN_POWER_PIN = 10;
 constexpr int FAN_PWM_PIN = 9;
 constexpr int FAN_SENSOR_PIN = 4;
 constexpr int CYCLE_START_MIN = 570; //09:30
@@ -35,10 +35,10 @@ void setup() {
 
   pcf.setYear(25);//set year
   pcf.setMonth(12);//set month
-  pcf.setDay(15);//set day
-  pcf.setHour(16);//set hour
-  pcf.setMinut(27);//set minut
-  pcf.setSecond(57);//set second
+  pcf.setDay(23);//set day
+  pcf.setHour(17);//set hour
+  pcf.setMinut(1);//set minut
+  pcf.setSecond(50);//set second
 
   pcf.startClock();//start the clock
   //************** end initialize the clock **************//
@@ -75,26 +75,15 @@ void fanControl(int currentTimeInMinutes){
                       currentTimeInMinutes % 21 == 0);
   if(shouldBeOn != isFanOn)
   {
+    //move serials to separate function
     isFanOn = shouldBeOn;
     Serial.print("Current speed: ");
     unsigned int rpms = fan.getSpeed(); // Send the command to get RPM
     Serial.print(rpms);
     Serial.println("RPM");
 
-  // Get new speed from Serial (0-100%)
-  // if (Serial.available() > 0) {
-    // Parse speed
-    // int input = Serial.parseInt();
-
-    // Constrain a 0-100 range
-    byte target = max(min(isFanOn ? 100 : 0, 100), 0);
-
-    // Print obtained value
-    Serial.print("Setting duty cycle: ");
-    Serial.println(target, DEC);
 
     // Set fan duty cycle
-    fan.setDutyCycle(target);
 
     // Get duty cycle
     byte dutyCycle = fan.getDutyCycle();
@@ -102,6 +91,12 @@ void fanControl(int currentTimeInMinutes){
     Serial.println(dutyCycle, DEC);
     Serial.println(isFanOn);
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
+
+    byte target = max(min(isFanOn ? 50 : 0, 100), 0);
+
+    Serial.print("Setting duty cycle: ");
+    Serial.println(target, DEC);
+    fan.setDutyCycle(target);
     // analogWrite(FAN_PWM_PIN, isFanOn ? 254 : 0);
   }
 
