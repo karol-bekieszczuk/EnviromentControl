@@ -5,8 +5,8 @@ constexpr int LIGHT_CTRL_PIN = 2;
 constexpr int FAN_POWER_PIN = 10;
 constexpr int FAN_PWM_PIN = 9;
 constexpr int FAN_SENSOR_PIN = 4;
-constexpr int CYCLE_START_MIN = 570; //09:30
-constexpr int CYCLE_STOP_MIN = 1290; //21:30
+constexpr int CYCLE_START_MIN = 600; //10:00
+constexpr int CYCLE_STOP_MIN = 1320; //22:00
 // Choose a threshold in milliseconds between readings.
 // A smaller value will give more updated results,
 // while a higher value will give more accurate and smooth readings
@@ -35,9 +35,9 @@ void setup()
 
   // pcf.setYear(25);//set year
   // pcf.setMonth(12);//set month
-  // pcf.setDay(23);//set day
-  // pcf.setHour(18);//set hour
-  // pcf.setMinut(3);//set minut
+  // pcf.setDay(26);//set day
+  // pcf.setHour(23);//set hour
+  // pcf.setMinut(7);//set minut
   // pcf.setSecond(50);//set second
 
   // pcf.startClock();//start the clock
@@ -83,7 +83,7 @@ void fanControl(int currentTimeInMinutes){
  
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 50 : 0, 100), 0);
+    byte target = max(min(isFanOn ? 70 : 0, 100), 0);
     fan.setDutyCycle(target);
   }
 
