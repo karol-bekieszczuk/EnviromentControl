@@ -57,7 +57,6 @@ void loop()
   fanControl(currentTimeInMinutes);
   // if(Serial.available() > 0){
     // printTime(nowTime);
-    // printFanData();
   // }
 }
 
@@ -98,18 +97,4 @@ void printTime(Time nowTime){
   Serial.print(nowTime.minute);
   Serial.print(":");
   Serial.println(nowTime.second);
-}
-
-void printFanData()
-{
-  Serial.print("Current speed: ");
-  //sprawdzic czy da sie wrzucic zawartosc rpms do linii ponizej
-  unsigned int rpms = fan.getSpeed();
-  Serial.print(rpms);
-  Serial.println("RPM");
-
-  Serial.print("Duty cycle: ");
-  //sprawdzic czy da sie wrzucic zawartosc dutyCycle do linii ponizej
-  byte dutyCycle = fan.getDutyCycle();
-  Serial.println(dutyCycle, DEC);
 }
