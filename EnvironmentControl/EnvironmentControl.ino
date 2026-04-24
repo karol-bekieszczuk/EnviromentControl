@@ -33,19 +33,20 @@ void setup()
   // set RTC time
   // pcf.stopClock();//stop the clock
 
-  // pcf.setYear(25);//set year
-  // pcf.setMonth(12);//set month
-  // pcf.setDay(26);//set day
-  // pcf.setHour(23);//set hour
-  // pcf.setMinut(7);//set minut
-  // pcf.setSecond(50);//set second
-
+  // pcf.setYear(26);//set year
+  // pcf.setMonth(4);//set month
+  // pcf.setDay(24);//set day
+  // pcf.setHour(15);//set hour
+  // pcf.setMinut(33);//set minut
+  // pcf.setSecond(0);//set second
+  
   // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
-
+  //************** initialize the fan **************//
   fan.begin();
+  //************** end initialize the fan **************//
 
-  // Serial.begin(9600);
+  //  Serial.begin(9600);
 }
 
 void loop() 
@@ -56,7 +57,7 @@ void loop()
   lightControl(currentTimeInMinutes);
   fanControl(currentTimeInMinutes);
   // if(Serial.available() > 0){
-    // printTime(nowTime);
+  // printTime(nowTime);
   // }
 }
 
@@ -75,11 +76,10 @@ void fanControl(int currentTimeInMinutes){
   static bool isFanOn = false;
   bool shouldBeOn = (currentTimeInMinutes >= CYCLE_START_MIN && 
                       currentTimeInMinutes < CYCLE_STOP_MIN &&
-                      currentTimeInMinutes % 21 == 0);
+                      currentTimeInMinutes % 5 == 0);
   if(shouldBeOn != isFanOn)
   {
     isFanOn = shouldBeOn;
- 
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
     byte target = max(min(isFanOn ? 70 : 0, 100), 0);
