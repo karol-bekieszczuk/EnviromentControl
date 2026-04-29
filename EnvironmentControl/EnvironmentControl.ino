@@ -30,15 +30,15 @@ void setup()
   //************** initialize the clock **************//
   pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
   
-  // set RTC time
+  // // set RTC time
   // pcf.stopClock();//stop the clock
 
   // pcf.setYear(26);//set year
   // pcf.setMonth(4);//set month
-  // pcf.setDay(24);//set day
-  // pcf.setHour(15);//set hour
-  // pcf.setMinut(33);//set minut
-  // pcf.setSecond(0);//set second
+  // pcf.setDay(29);//set day
+  // pcf.setHour(21);//set hour
+  // pcf.setMinut(52);//set minut
+  // pcf.setSecond(30);//set second
   
   // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
@@ -82,7 +82,7 @@ void fanControl(int currentTimeInMinutes){
     isFanOn = shouldBeOn;
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 70 : 0, 100), 0);
+    byte target = max(min(isFanOn ? 60 : 0, 100), 0);
     fan.setDutyCycle(target);
   }
 
