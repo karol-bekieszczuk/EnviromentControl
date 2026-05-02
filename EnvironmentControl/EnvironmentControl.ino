@@ -5,8 +5,8 @@ constexpr int LIGHT_CTRL_PIN = 2;
 constexpr int FAN_POWER_PIN = 10;
 constexpr int FAN_PWM_PIN = 9;
 constexpr int FAN_SENSOR_PIN = 4;
-constexpr int CYCLE_START_MIN = 600; //10:00
-constexpr int CYCLE_STOP_MIN = 1320; //22:00
+constexpr int CYCLE_START_MIN = 540; //9:00
+constexpr int CYCLE_STOP_MIN = 1380; //23:00
 // Choose a threshold in milliseconds between readings.
 // A smaller value will give more updated results,
 // while a higher value will give more accurate and smooth readings
@@ -34,11 +34,11 @@ void setup()
   // pcf.stopClock();//stop the clock
 
   // pcf.setYear(26);//set year
-  // pcf.setMonth(4);//set month
-  // pcf.setDay(29);//set day
-  // pcf.setHour(21);//set hour
-  // pcf.setMinut(52);//set minut
-  // pcf.setSecond(30);//set second
+  // pcf.setMonth(5);//set month
+  // pcf.setDay(2);//set day
+  // pcf.setHour(10);//set hour
+  // pcf.setMinut(42);//set minut
+  // pcf.setSecond(50);//set second
   
   // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
