@@ -5,8 +5,8 @@ constexpr int LIGHT_CTRL_PIN = 2;
 constexpr int FAN_POWER_PIN = 10;
 constexpr int FAN_PWM_PIN = 9;
 constexpr int FAN_SENSOR_PIN = 4;
-constexpr int CYCLE_START_MIN = 600; //10:00
-constexpr int CYCLE_STOP_MIN = 1320; //22:00
+constexpr int CYCLE_START_MIN = 540; //9:00
+constexpr int CYCLE_STOP_MIN = 1380; //23:00
 // Choose a threshold in milliseconds between readings.
 // A smaller value will give more updated results,
 // while a higher value will give more accurate and smooth readings
@@ -30,22 +30,23 @@ void setup()
   //************** initialize the clock **************//
   pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
   
-  // set RTC time
+  // // set RTC time
   // pcf.stopClock();//stop the clock
 
-  // pcf.setYear(25);//set year
-  // pcf.setMonth(12);//set month
-  // pcf.setDay(26);//set day
-  // pcf.setHour(23);//set hour
-  // pcf.setMinut(7);//set minut
+  // pcf.setYear(26);//set year
+  // pcf.setMonth(5);//set month
+  // pcf.setDay(2);//set day
+  // pcf.setHour(10);//set hour
+  // pcf.setMinut(42);//set minut
   // pcf.setSecond(50);//set second
-
+  
   // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
-
+  //************** initialize the fan **************//
   fan.begin();
+  //************** end initialize the fan **************//
 
-  // Serial.begin(9600);
+  //  Serial.begin(9600);
 }
 
 void loop() 
@@ -56,7 +57,7 @@ void loop()
   lightControl(currentTimeInMinutes);
   fanControl(currentTimeInMinutes);
   // if(Serial.available() > 0){
-    // printTime(nowTime);
+  // printTime(nowTime);
   // }
 }
 
@@ -75,14 +76,13 @@ void fanControl(int currentTimeInMinutes){
   static bool isFanOn = false;
   bool shouldBeOn = (currentTimeInMinutes >= CYCLE_START_MIN && 
                       currentTimeInMinutes < CYCLE_STOP_MIN &&
-                      currentTimeInMinutes % 21 == 0);
+                      currentTimeInMinutes % 5 == 0);
   if(shouldBeOn != isFanOn)
   {
     isFanOn = shouldBeOn;
- 
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 70 : 0, 100), 0);
+    byte target = max(min(isFanOn ? 60 : 0, 100), 0);
     fan.setDutyCycle(target);
   }
 
