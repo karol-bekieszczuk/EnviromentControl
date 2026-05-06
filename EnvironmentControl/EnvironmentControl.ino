@@ -35,10 +35,10 @@ void setup()
 
   // pcf.setYear(26);//set year
   // pcf.setMonth(5);//set month
-  // pcf.setDay(2);//set day
-  // pcf.setHour(10);//set hour
-  // pcf.setMinut(42);//set minut
-  // pcf.setSecond(50);//set second
+  // pcf.setDay(6);//set day
+  // pcf.setHour(19);//set hour
+  // pcf.setMinut(19);//set minut
+  // pcf.setSecond(58);//set second
   
   // pcf.startClock();//start the clock
   //************** end initialize the clock **************//
@@ -82,7 +82,7 @@ void fanControl(int currentTimeInMinutes){
     isFanOn = shouldBeOn;
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 60 : 0, 100), 0);
+    byte target = max(min(isFanOn ? 30 : 0, 100), 0);
     fan.setDutyCycle(target);
   }
 
