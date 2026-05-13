@@ -82,7 +82,7 @@ void fanControl(int currentTimeInMinutes){
     isFanOn = shouldBeOn;
     digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
     //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 30 : 0, 100), 0);
+    byte target = max(min(isFanOn ? 50 : 0, 100), 0);
     fan.setDutyCycle(target);
   }
 
