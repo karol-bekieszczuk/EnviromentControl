@@ -1,31 +1,18 @@
 #include <PCF8563.h>
-#include <FanController.h>
 
 constexpr int LIGHT_CTRL_PIN = 2;
-constexpr int FAN_POWER_PIN = 10;
-constexpr int FAN_PWM_PIN = 9;
-constexpr int FAN_SENSOR_PIN = 4;
-constexpr int CYCLE_START_MIN = 540; //9:00
-constexpr int CYCLE_STOP_MIN = 1380; //23:00
-// Choose a threshold in milliseconds between readings.
-// A smaller value will give more updated results,
-// while a higher value will give more accurate and smooth readings
-constexpr int FAN_SENSOR_THRESHOLD = 1000;
+constexpr int CYCLE_START_MIN = 600; //10:00
+constexpr int CYCLE_STOP_MIN = 1320; //22:00
 
 PCF8563 pcf;
-FanController fan(FAN_SENSOR_PIN, FAN_SENSOR_THRESHOLD, FAN_PWM_PIN);
 
 void setup() 
 {
   //************** set up pins mode **************//
   pinMode(LIGHT_CTRL_PIN, OUTPUT);
-  pinMode(FAN_POWER_PIN, OUTPUT);
-  // pinMode(FAN_PWM_PIN, OUTPUT);
   //************** end set up pins mode **************//
   //************** set up pins default state **************//
   digitalWrite(LIGHT_CTRL_PIN, LOW);
-  digitalWrite(FAN_POWER_PIN, LOW);
-  // analogWrite(FAN_PWM_PIN, 0);
   //************** end set up pins default state **************//
   //************** initialize the clock **************//
   pcf.init(); //THIS MUST BE UNCOMMENTED FOR THE RTC TO WORK!!
@@ -34,16 +21,16 @@ void setup()
   // pcf.stopClock();//stop the clock
 
   // pcf.setYear(26);//set year
-  // pcf.setMonth(5);//set month
-  // pcf.setDay(6);//set day
-  // pcf.setHour(19);//set hour
-  // pcf.setMinut(19);//set minut
+  // pcf.setMonth(6);//set month
+  // pcf.setDay(26);//set day
+  // pcf.setHour(18);//set hour
+  // pcf.setMinut(14);//set minut
   // pcf.setSecond(58);//set second
   
   // pcf.startClock();//start the clock
-  //************** end initialize the clock **************//
-  //************** initialize the fan **************//
-  fan.begin();
+  // //************** end initialize the clock **************//
+  // //************** initialize the fan **************//
+  // fan.begin();
   //************** end initialize the fan **************//
 
   //  Serial.begin(9600);
@@ -55,10 +42,7 @@ void loop()
   int currentTimeInMinutes = nowTime.hour * 60 + nowTime.minute;
 
   lightControl(currentTimeInMinutes);
-  fanControl(currentTimeInMinutes);
-  // if(Serial.available() > 0){
   // printTime(nowTime);
-  // }
 }
 
 void lightControl(int currentTimeInMinutes)
@@ -70,25 +54,6 @@ void lightControl(int currentTimeInMinutes)
     isLightOn = shouldBeOn;
     digitalWrite(LIGHT_CTRL_PIN, isLightOn ? HIGH : LOW);
   }
-}
-
-void fanControl(int currentTimeInMinutes){
-  static bool isFanOn = false;
-  bool shouldBeOn = (currentTimeInMinutes >= CYCLE_START_MIN && 
-                      currentTimeInMinutes < CYCLE_STOP_MIN &&
-                      currentTimeInMinutes % 5 == 0);
-  if(shouldBeOn != isFanOn)
-  {
-    isFanOn = shouldBeOn;
-    digitalWrite(FAN_POWER_PIN, isFanOn ? HIGH : LOW);
-    //sprawdzic czy da sie wrzucic zawartosc target do linii ponizej
-    byte target = max(min(isFanOn ? 50 : 0, 100), 0);
-    fan.setDutyCycle(target);
-  }
-
-  // Not really needed, just avoiding spamming the monitor,
-  // readings will be performed no faster than once every THRESHOLD ms anyway
-  delay(250);
 }
 
 void printTime(Time nowTime){
